@@ -30,7 +30,7 @@ CIFAR10/100 (Krizhevsky et al., 2009), SVHN (Netzer et al., 2011), and ImageNet 
 ### Visualization on several normalization techniques. Each subplot shows a feature map tensor with N the batch axes, C the channel axes, and (H, W) the spatial height and width axes.
 
 
-![model](./Proposed_method.jpg)
+![model](./_method.JPG)
 
 
 
