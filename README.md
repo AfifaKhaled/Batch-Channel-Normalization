@@ -57,13 +57,13 @@ numpy.
 
 
 
-![model](./Result2.jpg)
+![model](./Result2.JPG)
 
 
 #### The accuracy curve for ImageNet dataset.
 
 
-![model](./Result3.jpg)
+![model](./Result3.JPG)
 
 
 ## Contact
