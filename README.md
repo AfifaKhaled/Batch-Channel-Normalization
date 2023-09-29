@@ -16,7 +16,7 @@ The code is available in pytorch. To run the project kindly refer to the individ
 ## Dataset
 
 
-CIFAR10/100 (Krizhevsky et al., 2009), SVHN (Netzer et al., 2011), and ImageNet (Russakovsky et al., 2015)
+CIFAR10/100 (Krizhevsky et al., 2009), SVHN (Netzer et al., 2011), and ImageNet (Russakovsky et al., 2015)
 
 
 
@@ -27,7 +27,7 @@ CIFAR10/100 (Krizhevsky et al., 2009), SVHN (Netzer et al., 2011), and ImageNet
 ## Proposed Normalization technique
 
 
-### Visualization on several normalization techniques. Each subplot shows a feature map tensor with N the batch axes, C the channel axes, and (H, W) the spatial height and width axes.
+### Visualization on several normalization techniques. Each subplot shows a feature map tensor with N the batch axes, C the channel axes, and (H, W) the spatial height and width axes.
 
 
 ![model](./Proposed_method.jpg)
@@ -50,7 +50,7 @@ numpy.
 ### Training accuracy of different normalization techniques on (a) CIFAR-10, (b) CIFAR-100, (c) SVHN.
 
 
-![model](./Result1.jpg)
+![model](./Result1.JPG)
 
 
 #### Validation accuracy of different normalization techniques on (a) CIFAR-10, (b) CIFAR 100, (c) SVHN.
