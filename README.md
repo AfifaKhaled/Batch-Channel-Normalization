@@ -80,6 +80,10 @@ afifakhaied@tju.edu.cn
 
 D201880880@hust.edu.cn
 
+#### Jia Ning
+
+ninja@hust.edu.cn
+
 #### Kun He
 brooklet60@hust.edu.cn
 
