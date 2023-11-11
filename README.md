@@ -93,7 +93,7 @@ brooklet60@hust.edu.cn
 ## If you use this code for your research, please consider citing the original paper:
 
 
-We have submitted the manuscript to ICLR conference 2024 in 09/2023
+We have submitted the manuscript to CVPR conference 2024 in 011/2023
 
 
 
