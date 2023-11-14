@@ -31,8 +31,8 @@ class BatchNorm2D(nn.Module):
             # variance calculation is using the biased formula during training
             variance = torch.var(x, dim=[0, 2, 3], unbiased=False)
             mean = torch.mean(x, dim=[0, 2, 3])
-            self.runningmean = (1 - self.momentum) * mean + (self.momentum) * self.runningmean
-            self.runningvar = (1 - self.momentum) * variance + (self.momentum) * self.runningvar
+            self.runningmean.mul_(self.momentum).add_((1 - self.momentum) * mean.detach())
+            self.runningvar.mul_(self.momentum).add_((1 - self.momentum) * variance.detach())
             out = (x - mean.view([1, self.num_channels, 1, 1])) / torch.sqrt(
                 variance.view([1, self.num_channels, 1, 1]) + self.epsilon)
         else:
@@ -42,7 +42,7 @@ class BatchNorm2D(nn.Module):
             # during testing just use the running mean and (UnBiased) variance
         if (self.rescale == True):
             out = self.gamma.view([1, self.num_channels, 1, 1]) * out + self.beta.view([1, self.num_channels, 1, 1])
-            return out
+        return out
 
 
 class BatchNormm2D(nn.Module):
@@ -86,6 +86,81 @@ class BatchNormm2D(nn.Module):
         if (self.rescale == True):
             return out
 
+class BatchNormm2DViiT(nn.Module):
+    def __init__(self, num_channels, epsilon=1e-5, momentum=0.9, rescale=True):
+        super(BatchNormm2DViiT, self).__init__()
+        self.num_channels = num_channels
+        self.epsilon = epsilon
+        self.momentum = momentum
+        self.rescale = rescale
+
+        if (self.rescale == True):
+            # define parameters gamma, beta which are learnable
+            # dimension of gamma and beta should be (num_channels) ie its a one dimensional vector
+            # initializing gamma as ones vector and beta as zeros vector (implies no scaling/shifting at the start)
+            self.gamma = nn.Parameter(torch.ones(num_channels))
+            self.beta = nn.Parameter(torch.zeros(num_channels))
+        # define parameters running mean and variance which is not learnable
+        # keep track of mean and variance(but donot learn them), momentum is used which weighs current batch-mean and
+        # variance with the running mean and variance using (momentum*runningmean+(1-momentum)*currentmean)
+        self.register_buffer('runningmean', torch.zeros(num_channels))
+        self.register_buffer('runningvar', torch.ones(num_channels))
+
+    def forward(self, x):
+
+        if (self.training):
+            # calculate mean and variance along the dimensions other than the channel dimension
+            # variance calculation is using the biased formula during training
+            mean = x.mean(-1, keepdim=True)  # mean: [bsz, max_len, 1]
+            std = x.std(-1, keepdim=True)  # std: [bsz, max_len, 1]
+            self.runningmean = (1 - self.momentum) * mean + (self.momentum) * self.runningmean
+            self.runningvar = (1 - self.momentum) * std + (self.momentum) * self.runningvar
+            out=(x - mean) / (std +  self.epsilon)
+        else:
+            m = x.shape[0] * x.shape[2] * x.shape[3]
+            out = (x - self.runningmean) / torch.sqrt(
+                (m / (m - 1))* self.runningvar + self.epsilon)
+            # during testing just use the running mean and (UnBiased) variance
+        if (self.rescale == True):
+            out = self.a_2 * out + self.b_2
+            return out
+
+class BatchNormm2DViTC(nn.Module):
+    def __init__(self, num_channels, epsilon=1e-5, momentum=0.9, rescale=True):
+        super(BatchNormm2DViTC, self).__init__()
+        self.num_channels = num_channels
+        self.epsilon = epsilon
+        self.momentum = momentum
+        self.rescale = rescale
+
+        if (self.rescale == True):
+            # define parameters gamma, beta which are learnable
+            # dimension of gamma and beta should be (num_channels) ie its a one dimensional vector
+            # initializing gamma as ones vector and beta as zeros vector (implies no scaling/shifting at the start)
+            self.gamma = nn.Parameter(torch.ones(num_channels))
+            self.beta = nn.Parameter(torch.zeros(num_channels))
+        # define parameters running mean and variance which is not learnable
+        # keep track of mean and variance(but donot learn them), momentum is used which weighs current batch-mean and
+        # variance with the running mean and variance using (momentum*runningmean+(1-momentum)*currentmean)
+        self.register_buffer('runningmean', torch.zeros(num_channels))
+        self.register_buffer('runningvar', torch.ones(num_channels))
+
+    def forward(self, x):
+        if (self.training):
+            # calculate mean and variance along the dimensions other than the channel dimension
+            # variance calculation is using the biased formula during training
+            mean = x.mean(-1, keepdim=True)  # mean: [bsz, max_len, 1]
+            std = x.std(-1, keepdim=True)  # std: [bsz, max_len, 1]
+            self.runningmean = (1 - self.momentum) * mean + (self.momentum) * self.runningmean
+            self.runningvar = (1 - self.momentum) * std + (self.momentum) * self.runningvar
+            out=(x - mean) / (std +  self.epsilon)
+        else:
+            m = x.shape[0] * x.shape[2] * x.shape[3]
+            out = (x - self.runningmean) / torch.sqrt(
+                (m / (m - 1))* self.runningvar + self.epsilon)
+            # during testing just use the running mean and (UnBiased) variance
+        if (self.rescale == True):
+            return out
 
 class InstanceNorm2D(nn.Module):
     def __init__(self, num_channels, epsilon=1e-5, momentum=0.9, rescale=True):
@@ -128,6 +203,33 @@ class InstanceNorm2D(nn.Module):
             out = self.gamma.view([1, self.num_channels, 1, 1]) * out + self.beta.view([1, self.num_channels, 1, 1])
         return out
 
+class LayerNormViT(nn.Module):
+     def __init__(self, features, eps=1e-6):
+        super(LayerNormViT, self).__init__()
+
+        self.a_2 = nn.Parameter(torch.ones(features))
+        self.b_2 = nn.Parameter(torch.zeros(features))
+        self.eps = eps
+
+     def forward(self, x):
+        mean = x.mean(-1, keepdim=True)  # mean: [bsz, max_len, 1]
+        std = x.std(-1, keepdim=True)  # std: [bsz, max_len, 1]
+        return self.a_2 * (x - mean) / (std + self.eps) + self.b_2
+
+
+class LayerNormViTC(nn.Module):
+    def __init__(self, features, eps=1e-6):
+        super(LayerNormViTC, self).__init__()
+
+        self.a_2 = nn.Parameter(torch.ones(features))
+        self.b_2 = nn.Parameter(torch.zeros(features))
+        self.eps = eps
+
+    def forward(self, x):
+        mean = x.mean(-1, keepdim=True)  # mean: [bsz, max_len, 1]
+        std = x.std(-1, keepdim=True)  # std: [bsz, max_len, 1]
+        return(x - mean) / (std +  self.eps)
+
 
 class LayerNorm2D(nn.Module):
     def __init__(self, num_channels, epsilon = 1e-5):
@@ -139,8 +241,8 @@ class LayerNorm2D(nn.Module):
         self.beta = nn.Parameter(torch.zeros(num_channels))
 
     def forward(self, x):
-        assert list(x.shape)[1] == self.num_channels
-        assert len(x.shape) == 4 # 4 because len((batchsize, numchannels, height, width)) = 4
+      #  assert list(x.shape)[1] == self.num_channels
+       # assert len(x.shape) == 4 # 4 because len((batchsize, numchannels, height, width)) = 4
 
         variance, mean = torch.var(x, dim = [1,2, 3], unbiased=False), torch.mean(x, dim = [1,2, 3])
         out = (x-mean.view([-1, 1, 1, 1]))/torch.sqrt(variance.view([-1, 1, 1, 1])+self.epsilon)
@@ -295,4 +397,30 @@ class BatchChannelNorm(nn.Module):
                 1 - self.BCN_var.view([1, self.num_channels, 1, 1])) * Y
         out = self.gamma.view([1, self.num_channels, 1, 1]) * out + self.beta.view([1, self.num_channels, 1, 1])
         return out
+
+class BatchChannelNormvit(nn.Module):
+    def __init__(self, num_channels, epsilon=1e-5, momentum=0.9):
+            super(BatchChannelNormvit, self).__init__()
+            self.num_channels = num_channels
+            self.epsilon = epsilon
+            self.momentum = momentum
+            self.Batchh = BatchNormm2DViTC(self.num_channels, epsilon=self.epsilon)
+            self.layeer = LayerNormViTC(self.num_channels)
+            # The BCN variable to be learnt
+            self.BCN_var = nn.Parameter(torch.ones(self.num_channels))
+            # Gamma and Beta for rescaling
+            self.gamma = nn.Parameter(torch.ones(num_channels))
+            self.beta = nn.Parameter(torch.zeros(num_channels))
+
+    def forward(self, x):
+            X = self.Batchh(x)
+            Y = self.layeer(x)
+            out = self.BCN_var * X + (
+                    1 - self.BCN_var) * Y
+            out = self.gamma* out + self.beta
+            return out
+
+
+
+
 
