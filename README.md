@@ -58,7 +58,6 @@ numpy.
 ![model](./Result2.JPG)
 
 
-#### The accuracy curve for ImageNet dataset.
 
 
 
