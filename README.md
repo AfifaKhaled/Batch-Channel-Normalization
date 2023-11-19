@@ -50,7 +50,6 @@ numpy.
 ###  Training accuracy of different normalization techniques on (a) CIFAR-10, (b) CIFAR-100, (c) SVHN.
 
 
-![model](./Result1.JPG)
 
 
 ####  Validation accuracy of different normalization techniques on (a) CIFAR-10, (b) CIFAR 100, (c) SVHN.
@@ -62,8 +61,6 @@ numpy.
 
 #### The accuracy curve for ImageNet dataset.
 
-
-![model](./Result3.JPG)
 
 
 ## Contact
