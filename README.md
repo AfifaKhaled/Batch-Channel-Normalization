@@ -47,7 +47,6 @@ numpy.
 
 ## Some results from our paper
 
-###  Training accuracy of different normalization techniques on (a) CIFAR-10, (b) CIFAR-100, (c) SVHN.
 
 
 
