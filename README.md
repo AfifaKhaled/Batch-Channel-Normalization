@@ -90,14 +90,14 @@ brooklet60@hust.edu.cn
 
 We have submitted the manuscript to CVPR conference 2024 in 011/2023
 
-@misc{khaled2023bcn,
+     @misc{khaled2023bcn,
       title={BCN: Batch Channel Normalization for Image Classification}, 
       author={Afifa Khaled and Chao Li and Jia Ning and Kun He},
       year={2023},
       eprint={2312.00596},
       archivePrefix={arXiv},
       primaryClass={cs.CV}
-}
+     }
 
 
 
