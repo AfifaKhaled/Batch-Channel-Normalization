@@ -5,7 +5,7 @@
 ([Link for the paper ](https://arxiv.org/abs/2312.00596))
   
 
-This repository contains the pytorch   of the model we proposed in our paper:  BCN: BATCH CHANNEL NORMALIZATION
+This repository contains the pytorch   of the Normalization technique we proposed in our paper:  BCN: BATCH CHANNEL NORMALIZATION
 
 The code is available in pytorch. To run the project kindly refer to the individual readme file.
 
